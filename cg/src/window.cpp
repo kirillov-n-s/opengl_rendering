@@ -18,37 +18,68 @@ namespace cg
         _camera.rotate(x_offset * _sensitivity, y_offset * _sensitivity);
     }
 
-    void window::prepare()
+    void window::key_callback(GLFWwindow *window, int key, int scancode, int action, int mods)
     {
-        _projection = glm::perspective(_fov, _aspect, _near, _far);
-
-        _shader.use();
-
-        _shader.set_uniform("uModel", _model);
-        _shader.set_uniform("uNormalModel", _normal_model);
-        _shader.set_uniform("uProjection", _projection);
-
-        auto light = _lights[0];
-        _shader.set_uniform("uNegLightDir", -light.direction);
-        _shader.set_uniform("uAmbient", glm::vec3 { 0.f, 0.1f, 0.2f } * light.intensity);
-        _shader.set_uniform("uDiffuse", glm::vec3 { 0.f, 0.25f, 0.5f } * light.intensity);
-        _shader.set_uniform("uSpecular", glm::vec3 { 0.5f, 0.5f, 0.5f } * light.intensity);
-        _shader.set_uniform("uShininess", 64.f);
-    }
-
-    void window::handle_events(float frame_time)
-    {
-        if (glfwGetKey(_window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+        if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
             glfwSetWindowShouldClose(_window, GLFW_TRUE);
 
+        if (key == GLFW_KEY_SPACE && action == GLFW_PRESS)
+            glfwMaximizeWindow(_window);
+
+        if (key == GLFW_KEY_ENTER && action == GLFW_PRESS)
+            _camera = {};
+
+        auto i = key - GLFW_KEY_0;
+        if (i >= 0 && i <= 9 && action == GLFW_PRESS && _textures.size() > i)
+        {
+            _shader->use();
+            _shader->set_uniform("uTexture", _textures[_cur_tex_idx = i]->slot());
+        }
+    }
+
+    void window::prepare()
+    {
+        _projection = glm::perspective(glm::radians(_fov), _aspect, _near, _far);
+
+        _shader->use();
+
+        _shader->set_uniform("uModel", _model);
+        _shader->set_uniform("uNormalModel", _normal_model);
+        _shader->set_uniform("uProjection", _projection);
+
+        _shader->set_uniform("uTexture", _textures[_cur_tex_idx]->slot());
+
+        _shader->set_uniform("uAmbient", _material.ambient);
+        _shader->set_uniform("uDiffuse", _material.diffuse);
+        _shader->set_uniform("uSpecular", _material.specular);
+        _shader->set_uniform("uShininess", _material.shininess);
+
+        for (int i = 0; i < _lights.size(); ++i)
+        {
+            _shader->set_uniform(std::string("uLightDirs[") + std::to_string(i) + "]",
+                                 _lights[i].direction);
+            _shader->set_uniform(std::string("uLightColors[") + std::to_string(i) + "]",
+                                 _lights[i].color * _lights[i].intensity);
+        }
+
+        _skybox_shader->use();
+        _skybox_shader->set_uniform("uProjection", _projection);
+        _skybox_shader->set_uniform("uTexture", _skybox->slot());
+
+        glFrontFace(GL_CCW);
+        glEnable(GL_CULL_FACE);
+    }
+
+    void window::handle_movement(float frame_time)
+    {
         glm::vec3 direction = directions::zero;
         if (glfwGetKey(_window, GLFW_KEY_W) == GLFW_PRESS)
             direction += _camera.front();
         if (glfwGetKey(_window, GLFW_KEY_S) == GLFW_PRESS)
             direction -= _camera.front();
-        if (glfwGetKey(_window, GLFW_KEY_A) == GLFW_PRESS)
-            direction += _camera.right();
         if (glfwGetKey(_window, GLFW_KEY_D) == GLFW_PRESS)
+            direction += _camera.right();
+        if (glfwGetKey(_window, GLFW_KEY_A) == GLFW_PRESS)
             direction -= _camera.right();
         if (glfwGetKey(_window, GLFW_KEY_Q) == GLFW_PRESS)
             direction += directions::up;
@@ -59,10 +90,17 @@ namespace cg
 
     void window::render()
     {
-        _shader.use();
-        _shader.set_uniform("uView", _camera.view());
-        _shader.set_uniform("uCameraDir", _camera.front());
-        _mesh.draw();
+        auto view = _camera.view();
+
+        _skybox_shader->use();
+        _skybox_shader->set_uniform("uView", glm::mat4(glm::mat3(view)));
+        _skybox->draw();
+
+        _shader->use();
+        _shader->set_uniform("uView", view);
+        _shader->set_uniform("uCameraDir", _camera.front());
+        _textures[_cur_tex_idx]->use();
+        _mesh->draw();
     }
 
     void window::create(int width, int height)
@@ -89,19 +127,25 @@ namespace cg
 
         glfwSetFramebufferSizeCallback(_window, resize_callback);
         glfwSetCursorPosCallback(_window, cursor_callback);
+        glfwSetKeyCallback(_window, key_callback);
 
         glViewport(0, 0, _width, _height);
 
         glewInit();
     }
 
-    void window::load(const mesh& mesh, const texture& texture, const shader& shader,
-                      const camera& camera, const std::vector<light>& lights)
+    void window::load(mesh* mesh, const std::vector<texture*>& textures, shader* shader,
+                      skybox* skybox, class shader* skybox_shader,
+                      const camera& camera, const material& material, const std::vector<light>& lights)
     {
         _mesh = mesh;
-        _texture = texture;
+        _textures = textures;
         _shader = shader;
+        _skybox = skybox;
+        _skybox_shader = skybox_shader;
+
         _camera = camera;
+        _material = material;
         _lights = lights;
     }
 
@@ -111,10 +155,6 @@ namespace cg
 
         prepare();
 
-        glFrontFace(GL_CW);
-        glEnable(GL_CULL_FACE);
-        glEnable(GL_DEPTH_TEST);
-
         while(!glfwWindowShouldClose(_window))
         {
             current_frame = glfwGetTime();
@@ -123,9 +163,10 @@ namespace cg
 
             glfwSetWindowTitle(_window, (std::to_string((int)(1.f / frame_time)) + " fps").c_str());
 
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+            glClear(GL_COLOR_BUFFER_BIT);
 
-            handle_events(frame_time);
+            handle_movement(frame_time);
             render();
 
             glfwSwapBuffers(_window);

@@ -4,14 +4,14 @@ namespace cg
 {
     void camera::update_derived_vectors()
     {
-        glm::vec3 direction;
-        direction.x = cos(glm::radians(_yaw)) * cos(glm::radians(_pitch));
-        direction.y = sin(glm::radians(_pitch));
-        direction.z = sin(glm::radians(_yaw)) * cos(glm::radians(_pitch));
+        glm::vec3 front;
+        front.x = cos(glm::radians(_yaw)) * cos(glm::radians(_pitch));
+        front.y = sin(glm::radians(_pitch));
+        front.z = sin(glm::radians(_yaw)) * cos(glm::radians(_pitch));
 
-        _front = glm::normalize(direction);
-        _right = glm::normalize(glm::cross(directions::up, _front));
-        _up = glm::cross(_front, _right);
+        _front = glm::normalize(front);
+        _right = glm::normalize(glm::cross(_front, directions::up));
+        _up = glm::cross(_right, _front);
     }
 
     camera::camera(const glm::vec3 &position, float yaw, float pitch)
@@ -37,7 +37,7 @@ namespace cg
 
     glm::mat4 camera::view() const
     {
-        return glm::lookAtRH(_position, _position + _front, _up);
+        return glm::lookAt(_position, _position + _front, _up);
     }
 
     void camera::move(const glm::vec3 &offset)

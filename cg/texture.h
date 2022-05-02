@@ -1,16 +1,24 @@
-//
-// Created by user on 01.05.2022.
-//
+#pragma once
+#include <stdexcept>
+#include <string>
+#include "../stb_image/stb_image.h"
+#include <GL/glew.h>
 
-#ifndef LABA3_TEXTURE_H
-#define LABA3_TEXTURE_H
+namespace cg
+{
+    int texture_slots_used();
 
-namespace cg {
+    class texture
+    {
+    private:
+        unsigned int _id;
+        int _slot;
 
-    class texture {
+    public:
+        texture(const std::string& path);
 
+        void use() const;
+
+        int slot() const;
     };
-
-} // cg
-
-#endif //LABA3_TEXTURE_H
+}

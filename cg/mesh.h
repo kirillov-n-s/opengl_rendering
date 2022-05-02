@@ -15,12 +15,11 @@ namespace cg
         unsigned int _vbo, _vao, _ebo;
 
     public:
-        mesh() = default;
         mesh(const std::vector<float>& vertices, const std::vector<unsigned int>& indices);
         ~mesh();
 
         void draw() const;
     };
 
-    mesh make_uv_sphere(float radius, int rows, int cols);
+    mesh* make_uv_sphere(float radius, int row_count, int col_count);
 }

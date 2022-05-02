@@ -40,27 +40,25 @@ namespace cg
         glBindVertexArray(0);
     }
 
-    mesh make_uv_sphere(float radius, int rows, int cols)
+    mesh* make_uv_sphere(float radius, int row_count, int col_count)
     {
         std::vector<float> vertices;
         std::vector<unsigned int> indices;
 
-        float row_delta = pi / rows;
-        float col_delta = 2.f * pi / cols;
-        float inv_length = 1.f / radius;
+        float row_step = pi / row_count;
+        float col_step = 2 * pi / col_count;
+        float inv_radius = 1.0f / radius;
 
         float row_angle, col_angle, x, y, z, xy;
-
-        for (int i = 0; i <= rows; ++i)
+        for (int i = 0; i <= row_count; ++i)
         {
-            row_angle = pi * 0.5f - i * row_delta;
+            row_angle = pi / 2 - i * row_step;
             xy = radius * cosf(row_angle);
             z = radius * sinf(row_angle);
 
-            for (int j = 0; j <= cols; ++j)
+            for (int j = 0; j <= col_count; ++j)
             {
-                col_angle = j * col_delta;
-
+                col_angle = j * col_step;
                 x = xy * cosf(col_angle);
                 y = xy * sinf(col_angle);
 
@@ -68,50 +66,45 @@ namespace cg
                 vertices.push_back(y);
                 vertices.push_back(z);
 
-                vertices.push_back(x * inv_length);
-                vertices.push_back(y * inv_length);
-                vertices.push_back(z * inv_length);
+                vertices.push_back(x * inv_radius);
+                vertices.push_back(y * inv_radius);
+                vertices.push_back(z * inv_radius);
 
-                vertices.push_back((float)j / cols);
-                vertices.push_back((float)i / rows);
+                vertices.push_back((float)j / col_count);
+                vertices.push_back((float)i / row_count);
             }
         }
 
+        /*
+         *  t--t+1
+         *  |  / |
+         *  | /  |
+         *  b--b+1
+         */
         unsigned int top, bottom;
-
-        top = 0;
-        bottom = cols + 1;
-        for (int j = 0; j < cols; ++j, ++top, ++bottom)
+        for(int i = 0; i < row_count; ++i)
         {
-            indices.push_back(top + 1);
-            indices.push_back(bottom);
-            indices.push_back(bottom + 1);
-        }
+            top = i * (col_count + 1);
+            bottom = top + col_count + 1;
 
-        for (int i = 1; i < rows - 1; ++i)
-        {
-            top = i * (cols + 1);
-            bottom = top + cols + 1;
-            for (int j = 0; j < cols; ++j, ++top, ++bottom)
+            for(int j = 0; j < col_count; ++j, ++top, ++bottom)
             {
-                indices.push_back(top);
-                indices.push_back(bottom);
-                indices.push_back(top + 1);
-                indices.push_back(top + 1);
-                indices.push_back(bottom);
-                indices.push_back(bottom + 1);
+                if (i != 0)
+                {
+                    indices.push_back(top);
+                    indices.push_back(bottom);
+                    indices.push_back(top + 1);
+                }
+
+                if (i != (row_count - 1))
+                {
+                    indices.push_back(top + 1);
+                    indices.push_back(bottom);
+                    indices.push_back(bottom + 1);
+                }
             }
         }
 
-        top = (rows - 1) * (cols + 1);
-        bottom = top + cols + 1;
-        for (int j = 0; j < cols; ++j, ++top, ++bottom)
-        {
-            indices.push_back(top);
-            indices.push_back(bottom);
-            indices.push_back(top + 1);
-        }
-
-        return { vertices, indices };
+        return new mesh { vertices, indices };
     }
 }

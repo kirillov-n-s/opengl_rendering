@@ -105,6 +105,20 @@ build CMakeFiles\laba3.dir\cg\src\light.cpp.obj: CXX_COMPILER__laba3_Debug C$:\U
   TARGET_COMPILE_PDB = CMakeFiles\laba3.dir\
   TARGET_PDB = laba3.pdb
 
+build CMakeFiles\laba3.dir\cg\src\material.cpp.obj: CXX_COMPILER__laba3_Debug C$:\Users\user\Desktop\University\Sem2\Graph\laba3\cg\src\material.cpp || cmake_object_order_depends_target_laba3
+  FLAGS = /DWIN32 /D_WINDOWS /EHsc /Zi /Ob0 /Od /RTC1 -MDd -std:c++17
+  OBJECT_DIR = CMakeFiles\laba3.dir
+  OBJECT_FILE_DIR = CMakeFiles\laba3.dir\cg\src
+  TARGET_COMPILE_PDB = CMakeFiles\laba3.dir\
+  TARGET_PDB = laba3.pdb
+
+build CMakeFiles\laba3.dir\cg\src\skybox.cpp.obj: CXX_COMPILER__laba3_Debug C$:\Users\user\Desktop\University\Sem2\Graph\laba3\cg\src\skybox.cpp || cmake_object_order_depends_target_laba3
+  FLAGS = /DWIN32 /D_WINDOWS /EHsc /Zi /Ob0 /Od /RTC1 -MDd -std:c++17
+  OBJECT_DIR = CMakeFiles\laba3.dir
+  OBJECT_FILE_DIR = CMakeFiles\laba3.dir\cg\src
+  TARGET_COMPILE_PDB = CMakeFiles\laba3.dir\
+  TARGET_PDB = laba3.pdb
+
 
 # =============================================================================
 # Link build statements for EXECUTABLE target laba3
@@ -113,7 +127,7 @@ build CMakeFiles\laba3.dir\cg\src\light.cpp.obj: CXX_COMPILER__laba3_Debug C$:\U
 #############################################
 # Link the executable laba3.exe
 
-build laba3.exe: CXX_EXECUTABLE_LINKER__laba3_Debug CMakeFiles\laba3.dir\main.cpp.obj CMakeFiles\laba3.dir\stb_image\stb_image.cpp.obj CMakeFiles\laba3.dir\cg\src\mesh.cpp.obj CMakeFiles\laba3.dir\cg\src\window.cpp.obj CMakeFiles\laba3.dir\cg\src\shader.cpp.obj CMakeFiles\laba3.dir\cg\src\texture.cpp.obj CMakeFiles\laba3.dir\cg\src\camera.cpp.obj CMakeFiles\laba3.dir\cg\src\light.cpp.obj
+build laba3.exe: CXX_EXECUTABLE_LINKER__laba3_Debug CMakeFiles\laba3.dir\main.cpp.obj CMakeFiles\laba3.dir\stb_image\stb_image.cpp.obj CMakeFiles\laba3.dir\cg\src\mesh.cpp.obj CMakeFiles\laba3.dir\cg\src\window.cpp.obj CMakeFiles\laba3.dir\cg\src\shader.cpp.obj CMakeFiles\laba3.dir\cg\src\texture.cpp.obj CMakeFiles\laba3.dir\cg\src\camera.cpp.obj CMakeFiles\laba3.dir\cg\src\light.cpp.obj CMakeFiles\laba3.dir\cg\src\material.cpp.obj CMakeFiles\laba3.dir\cg\src\skybox.cpp.obj
   FLAGS = /DWIN32 /D_WINDOWS /EHsc /Zi /Ob0 /Od /RTC1 -MDd
   LINK_FLAGS = /machine:x64 /debug /INCREMENTAL /subsystem:console
   LINK_LIBRARIES = opengl32.lib  glew32.lib  glfw3.lib  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib

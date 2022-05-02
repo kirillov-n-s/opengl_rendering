@@ -19,8 +19,7 @@ namespace cg
         void update_derived_vectors();
 
     public:
-        camera() = default;
-        camera(const glm::vec3& position, float yaw = -90.f, float pitch = 0.f);
+        camera(const glm::vec3& position = cg::directions::back * 3.f, float yaw = -90.f, float pitch = 0.f);
 
         glm::vec3 front() const;
         glm::vec3 right() const;
