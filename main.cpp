@@ -15,13 +15,13 @@ int main()
         new cg::texture { texture_path + "earth.jpg" },
         new cg::texture { texture_path + "moon.jpg" },
         new cg::texture { texture_path + "mars.jpg" },
-        new cg::texture { texture_path + "venus.jpg" },
         new cg::texture { texture_path + "jupiter.jpg" },
         new cg::texture { texture_path + "saturn.jpg" },
         new cg::texture { texture_path + "uranus.jpg" },
         new cg::texture { texture_path + "neptune.jpg" },
         new cg::texture { texture_path + "roflan.png" },
         new cg::texture { texture_path + "amogus.png" },
+        new cg::texture { texture_path + "orehus.png" },
     };
     auto shader = new cg::shader {shader_path + "main.vert", shader_path + "main.frag" };
 
