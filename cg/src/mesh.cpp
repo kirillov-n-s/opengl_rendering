@@ -3,14 +3,14 @@
 namespace cg
 {
     mesh::mesh(const std::vector<float>& vertices, const std::vector<unsigned int>& indices)
-        : _vertices(vertices), _indices(indices)
+        : _element_count(indices.size())
     {
         glGenVertexArrays(1, &_vao);
         glBindVertexArray(_vao);
 
         glGenBuffers(1, &_vbo);
         glBindBuffer(GL_ARRAY_BUFFER, _vbo);
-        glBufferData(GL_ARRAY_BUFFER, _vertices.size() * sizeof(float), _vertices.data(), GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), vertices.data(), GL_STATIC_DRAW);
 
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, nullptr);
         glEnableVertexAttribArray(0);
@@ -21,7 +21,7 @@ namespace cg
 
         glGenBuffers(1, &_ebo);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ebo);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, _indices.size() * sizeof(unsigned int), _indices.data(), GL_STATIC_DRAW);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
 
         glBindVertexArray(0);
     }
@@ -36,7 +36,7 @@ namespace cg
     void mesh::draw() const
     {
         glBindVertexArray(_vao);
-        glDrawElements(GL_TRIANGLES, _indices.size(), GL_UNSIGNED_INT, nullptr);
+        glDrawElements(GL_TRIANGLES, _element_count, GL_UNSIGNED_INT, nullptr);
         glBindVertexArray(0);
     }
 

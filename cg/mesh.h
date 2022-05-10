@@ -9,9 +9,7 @@ namespace cg
     class mesh
     {
     private:
-        std::vector<float> _vertices;
-        std::vector<unsigned int> _indices;
-
+        int _element_count;
         unsigned int _vbo, _vao, _ebo;
 
     public:
