@@ -1,1 +1,1 @@
-University practice in computer graphics: using OpenGL
+University assignment in computer graphics: using OpenGL
